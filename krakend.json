@@ -1,0 +1,80 @@
+{
+    "$schema": "https://www.krakend.io/schema/v3.json",
+    "version": 3,
+    "name": "KrakenD My API Gateway",
+    "timeout": "3000ms",
+    "cache_ttl": "300s",
+    "endpoints": [
+        {
+            "@comment": "Feature: Aggregation + Basic transformation (filtering & mapping) + grouping",
+            "endpoint": "/api/git/{user}",
+            "backend": [
+                {
+                    "host": [
+                        "https://api.github.com"
+                    ],
+                    "url_pattern": "/users/{user}",
+                    "allow": [
+                        "avatar_url",
+                        "name",
+                        "company",
+                        "blog",
+                        "location",
+                        "mail",
+                        "hireable",
+                        "followers",
+                        "public_repos",
+                        "public_gists"
+                    ],
+                    "mapping": {
+                        "blog": "website"
+                    },
+                    "group": "user"
+                },
+                {
+                    "host": [
+                        "https://api.github.com"
+                    ],
+                    "url_pattern": "/users/{user}/repos",
+                    "mapping": {
+                        "collection": "repos"
+                    },
+                    "is_collection": true
+                }
+            ]
+        },
+        {
+            "endpoint": "/api/posts/{id}",
+            "method": "GET",
+            "output_encoding": "negotiate",
+            "backend": [
+                {
+                    "url_pattern": "/posts/{id}",
+                    "host": [
+                        "https://jsonplaceholder.typicode.com"
+                    ]
+                }
+            ]
+        },
+        {
+            "endpoint": "/api/todos/{id}",
+            "method": "GET",
+            "output_encoding": "json",
+            "backend": [
+                {
+                    "url_pattern": "/todos/{id}",
+                    "host": [
+                        "https://jsonplaceholder.typicode.com"
+                    ],
+                    "allow": [
+                        "id",
+                        "title"
+                    ],
+                    "method": "GET",
+                    "disable_host_sanitize": false
+                }
+            ]
+        }
+    ],
+    "output_encoding": "json"
+}
